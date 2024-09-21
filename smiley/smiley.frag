@@ -75,7 +75,7 @@ void main() {
 
 
     float radius = 0.2;
-    float frequency = 15.0;
+    float frequency = 10.0;
     float pos_x = cos(u_time * frequency) * radius;
     float pos_y = sin(u_time * frequency) * radius;
 
@@ -84,8 +84,9 @@ void main() {
 
     mask = Smiley(uv, vec2(pos_x,pos_y), 0.6);
 
+    float crazy_col = abs(sin(u_time));
     // multiply colour by the mask to set the colour
     // so either 1x or 0x...
-    color = vec3(1.0, 1.0, 0.0) * mask;
+    color = vec3(crazy_col, 1.0, 0.0) * mask;
     gl_FragColor = vec4(color, 1.0);
 }
