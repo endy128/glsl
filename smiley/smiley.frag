@@ -3,6 +3,7 @@ precision mediump float;
 #endif
 
 uniform vec2 u_resolution;
+uniform float u_time;
 
 // draws circle
 float Circle(vec2 uv, vec2 position, float radius, float blur) {
@@ -12,9 +13,9 @@ float Circle(vec2 uv, vec2 position, float radius, float blur) {
     return mask;
 }
 
-float Band(float t, float start, float end, float blur) {
-    float step1 = smoothstep(start - blur, start + blur, t);
-    float step2 = smoothstep(end + blur, end - blur, t);
+float Band(float position, float start, float end, float blur) {
+    float step1 = smoothstep(start - blur, start + blur, position);
+    float step2 = smoothstep(end + blur, end - blur, position);
     return step1 * step2;
 }
 
@@ -23,6 +24,17 @@ float Rect(vec2 uv, float left, float right, float bottom, float top, float blur
     float band2 = Band(uv.y, bottom, top, blur);
     return band1 * band2;
 }
+
+float Rect2(vec2 uv, float position_x, float position_y, float width, float height, float blur) {
+    // to centre the rectangle
+    float offset_h = width * 0.5;
+    float offset_y = height * 0.5;
+    float band_h = Band(uv.x, position_x - offset_h, position_x - offset_h+ width, blur);
+    float band_v = Band(uv.y, position_y - offset_y, position_y - offset_y+ height, blur);
+    return band_h * band_v;
+}
+
+
 
 float Smiley(vec2 uv, vec2 position, float size) {
     // translate coordinate system
@@ -59,10 +71,21 @@ void main() {
 
     float mask = 0.0;
 
-    mask = Rect(uv, -0.2, 0.2, -0.3, 0.3, 0.01);
+    // mask = Rect(uv, -0.2, 0.2, -0.3, 0.3, 0.01);
+
+
+    float radius = 0.2;
+    float frequency = 2.0;
+    float pos_x = cos(u_time * frequency) * radius;
+    float pos_y = sin(u_time * frequency) * radius;
+
+    // draws a rectange and moves it in a circle
+    mask = Rect2(uv, pos_x, pos_y, 0.2, 0.3, 0.01);
+
+    mask = Smiley(uv, vec2(pos_x,pos_y), 0.6);
 
     // multiply colour by the mask to set the colour
     // so either 1x or 0x...
-    color = vec3(1.0, 1.0, 1.0) * mask;
+    color = vec3(1.0, 1.0, 0.0) * mask;
     gl_FragColor = vec4(color, 1.0);
 }
