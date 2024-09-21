@@ -75,7 +75,7 @@ void main() {
 
 
     float radius = 0.2;
-    float frequency = 2.0;
+    float frequency = 15.0;
     float pos_x = cos(u_time * frequency) * radius;
     float pos_y = sin(u_time * frequency) * radius;
 
