@@ -2,8 +2,21 @@
 precision mediump float;
 #endif
 
+#define sat(x) clamp(x, 0.0, 1.0)
+
 uniform vec2 u_resolution;
 uniform float u_time;
+
+// remap num between 0-1 where a and b are the range
+float remap01(float a, float b, float num){
+    return sat((num-a) / (b-a));
+}
+
+// if num = a return c
+// if num = b return d and anything inbetween
+float remap(float a, float b, float c, float d, float num) {
+    return ((num-a) / (b-a)) * (d-c) + c;
+}
 
 // draws circle
 float Circle(vec2 uv, vec2 position, float radius, float blur) {
@@ -27,22 +40,19 @@ float Rect(vec2 uv, float left, float right, float bottom, float top, float blur
 
 float Rect2(vec2 uv, float position_x, float position_y, float width, float height, float blur) {
     // to centre the rectangle
-    float offset_h = width * 0.5;
-    float offset_y = height * 0.5;
+    float offset_h = width * 0.0; // 0.5
+    float offset_y = height * 0.0;
     float band_h = Band(uv.x, position_x - offset_h, position_x - offset_h+ width, blur);
     float band_v = Band(uv.y, position_y - offset_y, position_y - offset_y+ height, blur);
     return band_h * band_v;
 }
 
-// vec4 Mouth(vec2 uv) {
-//     uv -= 0.5;
-//     vec4 col = vec4(0.5, 0.18, 0.05, 1.0);
-
-//     float distance = length(uv);
-//     col.a = smoothstep(0.5, 0.48, distance);
-
-//     return col;
-// }
+float Mouth(vec2 uv, vec2 position, float distance, float radius, float blur){
+    if (uv.y < 0.0) {
+        distance = length(uv - position);
+    } else distance = 0.0;
+    return (1.0 - smoothstep(0.0, blur, abs(radius-distance)));
+}
 
 
 float Smiley(vec2 uv, vec2 position, float size) {
@@ -59,18 +69,9 @@ float Smiley(vec2 uv, vec2 position, float size) {
     mask -= Circle(uv, vec2(-0.15, 0.15), 0.1, 0.02);
 
     // draw mouth
-    float mouth = Circle(uv, vec2(0.0), 0.3, 0.02);
-    mouth -= Circle(uv, vec2(0.0, 0.1), 0.3, 0.02);
+    float mouth = Mouth(uv, vec2(0.0, 0.0), 0.3, 0.3, 0.02);
 
-
-    // subtract mouth from existing mask
-    // mask -= mouth;
-
-    float m = -(uv.x-0.5) * (uv.x+0.5);
-    m = m * m * 4.0;
-    float new_mouth = Rect2(vec2(uv.x, uv.y+m), 0.0, 0.0, 0.6, 0.05, 0.01);
-
-    mask -= new_mouth;
+    mask -= mouth;
     return mask;
 }
 
@@ -89,8 +90,8 @@ void main() {
     // mask = Rect(uv, -0.2, 0.2, -0.3, 0.3, 0.01);
 
 
-    float radius = 0.3;
-    float frequency = 10.0;
+    float radius = 0.2;
+    float frequency = 5.0;
     float pos_x = cos(u_time * frequency) * radius;
     float pos_y = sin(u_time * frequency) * radius;
 
@@ -99,9 +100,11 @@ void main() {
 
     mask = Smiley(uv, vec2(pos_x,pos_y), 0.6);
 
-    float crazy_col = abs(sin(u_time));
+    float col_r = abs(sin(u_time * 0.5));
+    float col_g = abs(sin(u_time * 2.0));
+    float col_b = abs(sin(u_time * 3.0));
     // multiply colour by the mask to set the colour
     // so either 1x or 0x...
-    color = vec3(crazy_col, 1.0, 0.0) * mask;
+    color = vec3(col_r, col_g, col_b) * mask;
     gl_FragColor = vec4(color, 1.0);
 }

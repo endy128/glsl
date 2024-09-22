@@ -7,13 +7,15 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-
-float remap01(float a, float b, float t){
-    return sat((t-a) / (b-a));
+// remap num between 0-1 where a and b are the range
+float remap01(float a, float b, float num){
+    return sat((num-a) / (b-a));
 }
 
-float remap(float a, float b, float c, float d, float t) {
-    return ((t-a) / (b-a)) * (d-c) + c;
+// if num = a return c
+// if num = b return d and anything inbetween
+float remap(float a, float b, float c, float d, float num) {
+    return ((num-a) / (b-a)) * (d-c) + c;
 }
 
 vec4 Head(vec2 uv){
