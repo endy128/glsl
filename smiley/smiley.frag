@@ -34,6 +34,15 @@ float Rect2(vec2 uv, float position_x, float position_y, float width, float heig
     return band_h * band_v;
 }
 
+// vec4 Mouth(vec2 uv) {
+//     uv -= 0.5;
+//     vec4 col = vec4(0.5, 0.18, 0.05, 1.0);
+
+//     float distance = length(uv);
+//     col.a = smoothstep(0.5, 0.48, distance);
+
+//     return col;
+// }
 
 
 float Smiley(vec2 uv, vec2 position, float size) {
@@ -53,9 +62,15 @@ float Smiley(vec2 uv, vec2 position, float size) {
     float mouth = Circle(uv, vec2(0.0), 0.3, 0.02);
     mouth -= Circle(uv, vec2(0.0, 0.1), 0.3, 0.02);
 
-    // subtract mouth from existing mask
-    mask -= mouth;
 
+    // subtract mouth from existing mask
+    // mask -= mouth;
+
+    float m = -(uv.x-0.5) * (uv.x+0.5);
+    m = m * m * 4.0;
+    float new_mouth = Rect2(vec2(uv.x, uv.y+m), 0.0, 0.0, 0.6, 0.05, 0.01);
+
+    mask -= new_mouth;
     return mask;
 }
 
@@ -74,7 +89,7 @@ void main() {
     // mask = Rect(uv, -0.2, 0.2, -0.3, 0.3, 0.01);
 
 
-    float radius = 0.2;
+    float radius = 0.3;
     float frequency = 10.0;
     float pos_x = cos(u_time * frequency) * radius;
     float pos_y = sin(u_time * frequency) * radius;
