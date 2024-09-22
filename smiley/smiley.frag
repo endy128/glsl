@@ -91,7 +91,7 @@ void main() {
 
 
     float radius = 0.2;
-    float frequency = 5.0;
+    float frequency = 3.0;
     float pos_x = cos(u_time * frequency) * radius;
     float pos_y = sin(u_time * frequency) * radius;
 
@@ -100,9 +100,9 @@ void main() {
 
     mask = Smiley(uv, vec2(pos_x,pos_y), 0.6);
 
-    float col_r = abs(sin(u_time * 0.5));
-    float col_g = abs(sin(u_time * 2.0));
-    float col_b = abs(sin(u_time * 3.0));
+    float col_r = abs(sin(u_time + 0.5));
+    float col_g = abs(sin(u_time + 2.0));
+    float col_b = abs(sin(u_time + 3.0));
     // multiply colour by the mask to set the colour
     // so either 1x or 0x...
     color = vec3(col_r, col_g, col_b) * mask;
