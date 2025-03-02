@@ -2,6 +2,7 @@ precision highp float;
 
 uniform vec2 u_resolution;  // viewport resolution (in pixels)
 uniform float u_time;       // shader playback time (in seconds)
+uniform vec2 u_mouse;
 
 // Function to create a checkerboard pattern
 vec4 checkerboardPattern(vec2 uv, float scale) {
@@ -33,6 +34,11 @@ vec4 checkerboardPattern(vec2 uv, float scale) {
 void main() {
     // Normalized pixel coordinates (from 0 to 1)
     vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+
+    // normalise the mouse coords
+    vec2 mouse_norm = vec2( 0.5 -u_mouse.x/u_resolution.x, 0.5-u_mouse.y/u_resolution.y );
+    // use mouse coords to move the pixel coords
+    uv += mouse_norm;
     
     // Compute aspect ratio
     float aspectRatio = u_resolution.x / u_resolution.y;
